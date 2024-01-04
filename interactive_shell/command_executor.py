@@ -7,8 +7,9 @@ class CommandExecutor:
     def execute(cls, ip: str, command: str) -> str:
         try:
             return cls._unsafe_execute(ip, command)
-        except ConnectionError:
-            raise ConnectionError("Can't connect to the GoFlex. Are you sure you wrote the correct IP address?")
+        except (requests.RequestException, ConnectionError) as exception:
+            raise ConnectionError("Can't connect to the GoFlex. Are you sure you wrote the correct IP address?") \
+                from exception
 
     @staticmethod
     def _unsafe_execute(ip: str, command: str) -> str:
