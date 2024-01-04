@@ -5,14 +5,16 @@ import typer
 
 from interactive_shell.interactive_shell import InteractiveShell
 
-IP_ADDRESS = "169.123.123.123"
-
 cli = typer.Typer()
 
 
+# noinspection PyUnusedFunction
 @cli.command()
-def shell() -> None:
-    InteractiveShell.interactive(IP_ADDRESS)
+def shell(ip: str) -> None:
+    try:
+        InteractiveShell.interactive(ip)
+    except Exception as exception:
+        print(exception)
 
 
 if __name__ == '__main__':
