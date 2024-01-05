@@ -2,7 +2,7 @@ import re
 
 import requests
 
-OUTPUT_PREFIX = re.compile(r'Your assigned port is \d+\s+([\s\S]*)')
+OUTPUT_PREFIX = re.compile(r'Your assigned port is \d+\s*([\s\S]*)')
 
 
 class CommandExecutor:
