@@ -32,7 +32,7 @@ def execute(ip: str, command: str) -> None:
 @cli.command()
 def ls(ip: str, path: str) -> None:
     try:
-        print(ListFiles(ip).execute(path))
+        print("\n".join(ListFiles(ip).execute(path)))
     except Exception as exception:
         print(exception)
 
