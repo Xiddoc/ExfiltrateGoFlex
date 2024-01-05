@@ -1,5 +1,5 @@
-from interactive_shell.command_executor import CommandExecutor
 from config import PROMPT
+from goflex_shell.command_executor import CommandExecutor
 
 
 class InteractiveShell:
