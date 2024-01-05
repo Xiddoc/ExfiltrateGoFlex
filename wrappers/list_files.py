@@ -9,4 +9,4 @@ class ListFiles(BaseCommand):
     def execute(self, path: str) -> List[str]:
         files = CommandExecutor.execute(self.ip, f"/bin/ls {path}")
 
-        return files.splitlines()
+        return files.decode().splitlines()
