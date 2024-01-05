@@ -1,15 +1,24 @@
+import re
+
 import requests
+
+OUTPUT_PREFIX = re.compile(r'Your assigned port is \d+\s+(.*)')
 
 
 class CommandExecutor:
 
     @classmethod
     def execute(cls, ip: str, command: str) -> str:
+        """
+        Executes a shell command and returns the output.
+        """
         try:
-            return cls._unsafe_execute(ip, command)
+            output = cls._unsafe_execute(ip, command)
         except (requests.RequestException, ConnectionError) as exception:
             raise ConnectionError("Can't connect to the GoFlex. Are you sure you wrote the correct IP address?") \
                 from exception
+
+        return OUTPUT_PREFIX.match(output).group(1)
 
     @staticmethod
     def _unsafe_execute(ip: str, command: str) -> str:

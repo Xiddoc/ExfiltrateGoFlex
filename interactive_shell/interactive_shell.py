@@ -9,4 +9,4 @@ class InteractiveShell:
         while True:
             command = input(PROMPT)
 
-            print(CommandExecutor.execute(ip, command).strip())
+            print(CommandExecutor.execute(ip, command))
