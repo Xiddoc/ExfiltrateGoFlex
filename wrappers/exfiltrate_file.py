@@ -28,7 +28,7 @@ class ExfiltrateFiles(BaseCommand):
                 self._write_to_file(str(full_path), contents)
 
     def _exfiltrate_file_content(self, file_path: str) -> bytes:
-        return CommandExecutor.execute(self.ip, f'cat "{file_path}"')
+        return CommandExecutor.execute(self.ip, f'/bin/cat "{file_path}"')
 
     def _write_to_file(self, path: str, data: bytes) -> None:
         relative_path_to_file = self._get_relative_path_from_absolute(ROOT_DIR, path)
