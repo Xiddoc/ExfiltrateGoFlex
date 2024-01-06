@@ -46,7 +46,9 @@ class ListPathInfo(BaseCommand):
 
     @staticmethod
     def _get_ls_info_command(path: str) -> str:
-        return LS_INFO_COMMAND.format(path)
+        escaped_path = UNICODE_ESCAPED_CHAR.sub(WILDCARD, path)
+
+        return LS_INFO_COMMAND.format(escaped_path)
 
     def _execute_ls_for_filenames(self, path: str) -> List[str]:
         """
