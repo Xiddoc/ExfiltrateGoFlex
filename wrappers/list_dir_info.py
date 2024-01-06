@@ -1,14 +1,13 @@
-import re
 from dataclasses import dataclass
-from typing import List
+from typing import List, Tuple
 
 from goflex_shell.command_executor import CommandExecutor
 from wrappers.base_wrapper import BaseCommand
 
 LS_OUTPUT_PREFIX = 'total'
-LS_FILENAME_REGEX = re.compile(r'"(.*?)"')
 DIRECTORY_MARKER = 'd'
-LS_COMMAND = '/bin/ls -q -l "{}"'
+LS_INFO_COMMAND = '/bin/ls -l "{}"'
+LS_FILENAMES_COMMAND = '/bin/ls -1 -q "{}"'
 
 
 @dataclass
@@ -20,9 +19,10 @@ class PathInfo:
 class ListPathInfo(BaseCommand):
 
     def execute(self, path: str) -> List[PathInfo]:
-        ls_output = self._remove_ls_header_line(self._execute_ls(path))
+        ls_info_output = self._remove_ls_header_line(self._execute_info_ls(path))
+        ls_filenames_output = self._execute_ls_for_filenames(path)
 
-        paths = [self._get_path_info_from_entry(entry) for entry in ls_output]
+        paths = [self._get_path_info_from_entry(entry) for entry in zip(ls_info_output, ls_filenames_output)]
 
         return paths
 
@@ -35,19 +35,30 @@ class ListPathInfo(BaseCommand):
         """
         return ls_output[1:] if ls_output[0].startswith(LS_OUTPUT_PREFIX) else ls_output
 
-    def _execute_ls(self, path: str) -> List[str]:
+    def _execute_info_ls(self, path: str) -> List[str]:
         """
         Executes LS, returns the command output in lines of strings.
         """
-        return CommandExecutor.execute(self.ip, self._get_ls_command(path)).decode().splitlines()
+        return CommandExecutor.execute(self.ip, self._get_ls_info_command(path)).decode().splitlines()
 
     @staticmethod
-    def _get_ls_command(path: str) -> str:
-        return LS_COMMAND.format(path)
+    def _get_ls_info_command(path: str) -> str:
+        return LS_INFO_COMMAND.format(path)
+
+    def _execute_ls_for_filenames(self, path: str) -> List[str]:
+        """
+        Executes LS, returns the command output in lines of strings.
+        """
+        return CommandExecutor.execute(self.ip, self._get_ls_filenames_command(path)).decode().splitlines()
 
     @staticmethod
-    def _get_path_info_from_entry(entry: str) -> PathInfo:
-        is_dir = entry.startswith(DIRECTORY_MARKER)
-        file_name = LS_FILENAME_REGEX.search(entry).group(1)
+    def _get_ls_filenames_command(path: str) -> str:
+        return LS_FILENAMES_COMMAND.format(path)
 
-        return PathInfo(is_dir, file_name)
+    @staticmethod
+    def _get_path_info_from_entry(entry: Tuple[str, str]) -> PathInfo:
+        is_dir_entry, filename = entry
+
+        is_dir = is_dir_entry.startswith(DIRECTORY_MARKER)
+
+        return PathInfo(is_dir, filename)
