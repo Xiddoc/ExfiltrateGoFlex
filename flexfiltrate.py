@@ -1,8 +1,6 @@
 """
 CLI interface for the exfiltrator.
 """
-import os
-from pathlib import Path
 
 import typer
 
@@ -44,16 +42,10 @@ def ls(ip: str, path: str) -> None:
 # noinspection PyUnusedFunction
 @cli.command()
 def pull(ip: str, path: str) -> None:
-    try:
-        try:
-            os.makedirs(str(Path(path).parent))
-        except OSError:
-            pass
-
-        with open(path, 'wb') as file:
-            file.write(ExfiltrateFiles(ip).execute(path))
-    except Exception as exception:
-        print(exception)
+    # try:
+    ExfiltrateFiles(ip).execute(path)
+    # except Exception as exception:
+    #     print(exception)
 
 
 if __name__ == '__main__':
