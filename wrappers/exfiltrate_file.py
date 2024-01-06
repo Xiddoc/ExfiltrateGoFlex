@@ -5,11 +5,9 @@ from pathlib import Path
 from config import ROOT_DIR
 from goflex_shell.command_executor import CommandExecutor
 from wrappers.base_wrapper import BaseCommand
-from wrappers.list_dir_info import ListPathInfo
+from wrappers.list_dir_info import ListPathInfo, UNICODE_ESCAPED_CHAR, WILDCARD
 
 CAT_COMMAND = '/bin/cat "{}"'
-UNICODE_ESCAPED_CHAR = re.compile(r"\?+")
-WILDCARD = '"*"'
 
 
 class ExfiltrateFiles(BaseCommand):

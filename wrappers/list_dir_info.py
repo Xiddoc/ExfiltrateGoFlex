@@ -1,14 +1,16 @@
+import re
 from dataclasses import dataclass
 from typing import List, Tuple
 
 from goflex_shell.command_executor import CommandExecutor
 from wrappers.base_wrapper import BaseCommand
-from wrappers.exfiltrate_file import UNICODE_ESCAPED_CHAR, WILDCARD
 
 LS_OUTPUT_PREFIX = 'total'
 DIRECTORY_MARKER = 'd'
 LS_INFO_COMMAND = '/bin/ls -l "{}"'
 LS_FILENAMES_COMMAND = '/bin/ls -1 -q "{}"'
+UNICODE_ESCAPED_CHAR = re.compile(r"\?+")
+WILDCARD = '"*"'
 
 
 @dataclass
