@@ -3,6 +3,7 @@ from typing import List, Tuple
 
 from goflex_shell.command_executor import CommandExecutor
 from wrappers.base_wrapper import BaseCommand
+from wrappers.exfiltrate_file import UNICODE_ESCAPED_CHAR, WILDCARD
 
 LS_OUTPUT_PREFIX = 'total'
 DIRECTORY_MARKER = 'd'
@@ -53,7 +54,9 @@ class ListPathInfo(BaseCommand):
 
     @staticmethod
     def _get_ls_filenames_command(path: str) -> str:
-        return LS_FILENAMES_COMMAND.format(path)
+        escaped_path = UNICODE_ESCAPED_CHAR.sub(WILDCARD, path)
+
+        return LS_FILENAMES_COMMAND.format(escaped_path)
 
     @staticmethod
     def _get_path_info_from_entry(entry: Tuple[str, str]) -> PathInfo:
