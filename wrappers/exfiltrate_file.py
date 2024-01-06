@@ -51,9 +51,10 @@ class ExfiltrateFiles(BaseCommand):
     def _write_to_file(self, path: str, data: bytes) -> None:
         relative_path_to_file = self._get_relative_path_from_absolute(ROOT_DIR, path)
 
-        self._create_dirs(relative_path_to_file)
+        write_path = self._escape_question_marks(relative_path_to_file)
 
-        self._write_bytes_to_file(str(relative_path_to_file), data)
+        self._create_dirs(write_path)
+        self._write_bytes_to_file(write_path, data)
 
     @staticmethod
     def _get_relative_path_from_absolute(local_path: str, remote_path: str) -> Path:
@@ -64,9 +65,9 @@ class ExfiltrateFiles(BaseCommand):
         return relative_path_to_file
 
     @staticmethod
-    def _create_dirs(file_path: Path) -> None:
+    def _create_dirs(file_path: str) -> None:
         try:
-            os.makedirs(str(file_path.parent))
+            os.makedirs(str(Path(file_path).parent))
         except OSError:
             pass
 
@@ -74,3 +75,7 @@ class ExfiltrateFiles(BaseCommand):
     def _write_bytes_to_file(relative_path_to_file: str, data: bytes) -> None:
         with open(relative_path_to_file, 'wb') as file:
             file.write(data)
+
+    @staticmethod
+    def _escape_question_marks(relative_path_to_file: Path) -> str:
+        return str(relative_path_to_file).replace("?", "_")
